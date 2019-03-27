@@ -5,16 +5,13 @@ import numpy as np
 from pprint import pprint as pp
 from config import config
 
-# Request info
-TOKEN = config["TOKEN"]
-baseURL = "https://api.groupme.com/v3"
-auth = "?token="+TOKEN
-endPoint = "/groups/47836505/messages"
 
-
-# Determine whether to hit API for new data
-pullNewData = False
-if pullNewData:
+def pullData():
+    # Request info
+    TOKEN = config["TOKEN"]
+    baseURL = "https://api.groupme.com/v3"
+    auth = "?token="+TOKEN
+    endPoint = "/groups/47836505/messages"
     allMessages = []
     messages = json.loads(requests.get(
         baseURL+endPoint+auth).text)["response"]["messages"]
@@ -65,25 +62,40 @@ def createStats(messages):
     return numMessages, numLikes
 
 
+def processMessageDF(messages):
+    """
+    Process messages dataframe
+    """
+
+    mesDic = messages.to_dict('records')
+    mesDic = [{"likes": int((len(x["favorited_by"]) / 12)), "text": x["text"],
+               "attachments": x["attachments"], "name": x["name"]} for x in mesDic]
+    mesDic.sort(key=lambda x: x["likes"], reverse=True)
+    return mesDic
+
+
+# Determine whether to hit API for new data
+pullNewData = False
+if pullNewData:
+    pullData()
+
 # Read data from CSV
 messages = pd.read_csv("messages.csv")
-mesDic = messages.to_dict('records')
+
 # Get Stats
+mesDic = processMessageDF(messages)
 numMessages, numLikes = createStats(messages)
 
 
-mesDic.sort(key=lambda x: len(x["favorited_by"]), reverse=True)
 print("MOST LIKED MESSAGES")
-print("")
-pp(mesDic[:5])
+pp(mesDic[: 5])
 print("")
 
-topLikes = numLikes[:10]
+topLikes = numLikes[: 10]
 print("Top Users by Like Count")
 pp(topLikes)
 print("")
 
-topMessages = numMessages[:10]
+topMessages = numMessages[: 10]
 print("Top Users by Message #")
-print("")
 pp(topMessages)
