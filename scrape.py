@@ -5,15 +5,13 @@ import numpy as np
 from pprint import pprint as pp
 from config import config
 
-# Request info
-TOKEN = config["TOKEN"]
-baseURL = "https://api.groupme.com/v3"
-auth = "?token="+TOKEN
-endPoint = "/groups/47836505/messages"
 
-# Determine whether to hit API for new data
-pullNewData = False
-if pullNewData:
+def pullData():
+    # Request info
+    TOKEN = config["TOKEN"]
+    baseURL = "https://api.groupme.com/v3"
+    auth = "?token="+TOKEN
+    endPoint = "/groups/47836505/messages"
     allMessages = []
     messages = json.loads(requests.get(
         baseURL+endPoint+auth).text)["response"]["messages"]
@@ -75,6 +73,11 @@ def processMessageDF(messages):
     mesDic.sort(key=lambda x: x["likes"], reverse=True)
     return mesDic
 
+
+# Determine whether to hit API for new data
+pullNewData = False
+if pullNewData:
+    pullData()
 
 # Read data from CSV
 messages = pd.read_csv("messages.csv")
