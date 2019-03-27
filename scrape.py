@@ -34,10 +34,8 @@ def pullData():
 
 
 def getLikes(messages):
-    """Get a users likes from their messages
-
-    Returns:
-        int -- [number of likes]
+    """
+    Get a users likes from their messages
     """
     s = 0
     for i in messages["favorited_by"]:
