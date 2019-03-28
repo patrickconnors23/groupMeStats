@@ -1,4 +1,5 @@
 import requests
+import argparse
 import json
 import pandas as pd
 from pprint import pprint as pp
@@ -71,28 +72,38 @@ def processMessageDF(messages):
     return mesDic
 
 
-# Determine whether to hit API for new data
-pullNewData = False
-if pullNewData:
-    pullData()
+def displayStats(pullNewData=False):
+    if pullNewData:
+        pullData()
 
-# Read data from CSV
-messages = pd.read_csv("messages.csv")
+    # Read data from CSV
+    messages = pd.read_csv("messages.csv")
 
-# Get Stats
-mesDic = processMessageDF(messages)
-numMessages, numLikes = createStats(messages)
+    # Get Stats
+    mesDic = processMessageDF(messages)
+    numMessages, numLikes = createStats(messages)
+
+    print("MOST LIKED MESSAGES")
+    pp(mesDic[: 5])
+    print("")
+
+    topLikes = numLikes[: 10]
+    print("Top Users by Like Count")
+    pp(topLikes)
+    print("")
+
+    topMessages = numMessages[: 10]
+    print("Top Users by Message #")
+    pp(topMessages)
 
 
-print("MOST LIKED MESSAGES")
-pp(mesDic[: 5])
-print("")
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--pullData')
+    args = parser.parse_args()
+    if args.pullData == "True":
+        pullNewData = True
+    else:
+        pullNewData = False
 
-topLikes = numLikes[: 10]
-print("Top Users by Like Count")
-pp(topLikes)
-print("")
-
-topMessages = numMessages[: 10]
-print("Top Users by Message #")
-pp(topMessages)
+    displayStats(pullNewData)
