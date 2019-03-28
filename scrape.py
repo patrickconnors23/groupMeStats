@@ -7,11 +7,15 @@ from config import config
 
 
 def pullData():
+    """
+    Pull Data from GroupMe API
+    """
     # Request info
     TOKEN = config["TOKEN"]
+    GROUP_ID = config["GROUP_ID"]
     baseURL = "https://api.groupme.com/v3"
     auth = "?token="+TOKEN
-    endPoint = "/groups/47836505/messages"
+    endPoint = "/groups/"+GROUP_ID+"/messages"
     allMessages = []
     messages = json.loads(requests.get(
         baseURL+endPoint+auth).text)["response"]["messages"]
@@ -44,7 +48,6 @@ def getLikes(messages):
     return s
 
 
-# Get
 def createStats(messages):
     """
     Get stats from user groupby obj
